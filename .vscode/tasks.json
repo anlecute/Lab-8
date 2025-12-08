@@ -1,0 +1,67 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Run Spring Boot Application",
+			"type": "shell",
+			"command": "mvn spring-boot:run",
+			"args": [],
+			"isBackground": false,
+			"problemMatcher": [
+				"$javac"
+			],
+			"group": "build"
+		},
+		{
+			"label": "Run Maven Project",
+			"type": "shell",
+			"command": "mvn clean spring-boot:run",
+			"args": [],
+			"isBackground": false,
+			"problemMatcher": [
+				"$javac"
+			],
+			"group": "build"
+		},
+		{
+			"label": "Run Maven Spring Boot",
+			"type": "shell",
+			"command": "mvn spring-boot:run",
+			"isBackground": false,
+			"problemMatcher": [
+				"$javac"
+			],
+			"group": "build"
+		},
+		{
+			"label": "Run Maven Java App",
+			"type": "shell",
+			"command": "mvn clean install",
+			"isBackground": false,
+			"problemMatcher": [
+				"$javac"
+			],
+			"group": "build"
+		},
+		{
+			"label": "Maven Package",
+			"type": "shell",
+			"command": "mvn package",
+			"isBackground": false,
+			"problemMatcher": [
+				"$javac"
+			],
+			"group": "build"
+		},
+		{
+			"label": "Run Spring Boot Application",
+			"type": "shell",
+			"command": "mvn spring-boot:run",
+			"isBackground": false,
+			"problemMatcher": [
+				"$javac"
+			],
+			"group": "build"
+		}
+	]
+}
