@@ -4,10 +4,12 @@ import com.example.customerapi.dto.CustomerRequestDTO;
 import com.example.customerapi.dto.CustomerResponseDTO;
 
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 
 public interface CustomerService {
 
-    List<CustomerResponseDTO> getAllCustomers();
+    Page<CustomerResponseDTO> getAllCustomers(int page, int size, String sortBy, String sortDir);
 
     CustomerResponseDTO getCustomerById(Long id);
 
@@ -20,4 +22,6 @@ public interface CustomerService {
     List<CustomerResponseDTO> searchCustomers(String keyword);
 
     List<CustomerResponseDTO> getCustomersByStatus(String status);
+
+    List<CustomerResponseDTO> advancedSearch(String name, String email, String status);
 }

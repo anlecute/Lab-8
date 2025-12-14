@@ -25,11 +25,20 @@ public class CustomerRestController {
         this.customerService = customerService;
     }
 
-    // GET all customers
+    // GET all customers with pagination and sorting
     @GetMapping
-    public ResponseEntity<List<CustomerResponseDTO>> getAllCustomers() {
-        List<CustomerResponseDTO> customers = customerService.getAllCustomers();
-        return ResponseEntity.ok(customers);
+    public ResponseEntity<Map<String, Object>> getAllCustomers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "3") int size,
+            @RequestParam(required = false) String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDir) {
+        var customerPage = customerService.getAllCustomers(page, size, sortBy, sortDir);
+        Map<String, Object> response = new HashMap<>();
+        response.put("customers", customerPage.getContent());
+        response.put("currentPage", customerPage.getNumber());
+        response.put("totalItems", customerPage.getTotalElements());
+        response.put("totalPages", customerPage.getTotalPages());
+        return ResponseEntity.ok(response);
     }
 
     // GET customer by ID
@@ -68,6 +77,16 @@ public class CustomerRestController {
     @GetMapping("/search")
     public ResponseEntity<List<CustomerResponseDTO>> searchCustomers(@RequestParam String keyword) {
         List<CustomerResponseDTO> customers = customerService.searchCustomers(keyword);
+        return ResponseEntity.ok(customers);
+    }
+
+    // GET advanced search with multiple criteria
+    @GetMapping("/advanced-search")
+    public ResponseEntity<List<CustomerResponseDTO>> advancedSearch(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) String status) {
+        List<CustomerResponseDTO> customers = customerService.advancedSearch(name, email, status);
         return ResponseEntity.ok(customers);
     }
 

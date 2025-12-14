@@ -8,23 +8,34 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Repository
 public interface CustomerRepository extends JpaRepository<Customer, Long> {
 
-    Optional<Customer> findByCustomerCode(String customerCode);
+        Page<Customer> findAll(Pageable pageable);
 
-    Optional<Customer> findByEmail(String email);
+        Optional<Customer> findByCustomerCode(String customerCode);
 
-    boolean existsByCustomerCode(String customerCode);
+        Optional<Customer> findByEmail(String email);
 
-    boolean existsByEmail(String email);
+        boolean existsByCustomerCode(String customerCode);
 
-    List<Customer> findByStatus(com.example.customerapi.entity.CustomerStatus status);
+        boolean existsByEmail(String email);
 
-    @Query("SELECT c FROM Customer c WHERE " +
-            "LOWER(c.fullName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-            "LOWER(c.email) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-            "LOWER(c.customerCode) LIKE LOWER(CONCAT('%', :keyword, '%'))")
-    List<Customer> searchCustomers(@Param("keyword") String keyword);
+        List<Customer> findByStatus(com.example.customerapi.entity.CustomerStatus status);
+
+        @Query("SELECT c FROM Customer c WHERE " +
+                        "(:name IS NULL OR LOWER(c.fullName) LIKE LOWER(CONCAT('%', :name, '%'))) AND " +
+                        "(:email IS NULL OR LOWER(c.email) LIKE LOWER(CONCAT('%', :email, '%'))) AND " +
+                        "(:status IS NULL OR c.status = :status)")
+        List<Customer> advancedSearch(@Param("name") String name, @Param("email") String email,
+                        @Param("status") com.example.customerapi.entity.CustomerStatus status);
+
+        @Query("SELECT c FROM Customer c WHERE " +
+                        "LOWER(c.fullName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+                        "LOWER(c.email) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+                        "LOWER(c.customerCode) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+        List<Customer> searchCustomers(@Param("keyword") String keyword);
 }

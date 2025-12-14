@@ -12,6 +12,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 @Service
 @Transactional
@@ -25,11 +30,19 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public List<CustomerResponseDTO> getAllCustomers() {
-        return customerRepository.findAll()
-                .stream()
+    public Page<CustomerResponseDTO> getAllCustomers(int page, int size, String sortBy, String sortDir) {
+        Sort sort = Sort.unsorted();
+        if (sortBy != null && !sortBy.isEmpty()) {
+            sort = sortDir.equalsIgnoreCase("desc")
+                    ? Sort.by(sortBy).descending()
+                    : Sort.by(sortBy).ascending();
+        }
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<Customer> customerPage = customerRepository.findAll(pageable);
+        List<CustomerResponseDTO> dtoList = customerPage.getContent().stream()
                 .map(this::convertToResponseDTO)
                 .collect(Collectors.toList());
+        return new PageImpl<>(dtoList, pageable, customerPage.getTotalElements());
     }
 
     @Override
@@ -111,6 +124,25 @@ public class CustomerServiceImpl implements CustomerService {
                 .stream()
                 .map(this::convertToResponseDTO)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<CustomerResponseDTO> advancedSearch(String name, String email, String status) {
+        String nameParam = (name == null || name.trim().isEmpty()) ? null : name;
+        String emailParam = (email == null || email.trim().isEmpty()) ? null : email;
+        com.example.customerapi.entity.CustomerStatus enumStatus = null;
+        if (status != null && !status.trim().isEmpty()) {
+            try {
+                enumStatus = com.example.customerapi.entity.CustomerStatus.valueOf(status.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                throw new ResourceNotFoundException("Invalid status: " + status);
+            }
+        }
+        List<Customer> customers = customerRepository.advancedSearch(
+                nameParam,
+                emailParam,
+                enumStatus);
+        return customers.stream().map(this::convertToResponseDTO).collect(Collectors.toList());
     }
 
     // Helper Methods for DTO Conversion

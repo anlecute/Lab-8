@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.8em;
+            font-weight: 700;
+            letter-spacing: -1px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #999;
+            margin-bottom: 40px;
+            font-size: 1.1em;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .controls-left {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .search-box, .advanced-search {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .search-box h3, .advanced-search h3 {
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+
+        .search-form {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            min-width: 200px;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #555;
+            font-size: 0.9em;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        select {
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #333;
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .sort-controls {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .sort-controls label {
+            font-weight: 600;
+            color: #555;
+        }
+
+        .sort-controls select {
+            min-width: 150px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+            transition: background 0.3s;
+        }
+
+        th:hover {
+            background: linear-gradient(135deg, #5568d3 0%, #653a8b 100%);
+        }
+
+        th.sortable::after {
+            content: ' ⇅';
+            opacity: 0.5;
+            font-size: 0.8em;
+        }
+
+        th.sorted-asc::after {
+            content: ' ↑';
+            opacity: 1;
+        }
+
+        th.sorted-desc::after {
+            content: ' ↓';
+            opacity: 1;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-inactive {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-suspended {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .pagination-info {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: white;
+            margin: 50px auto;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 600px;
+            animation: slideDown 0.3s;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            color: #667eea;
+        }
+
+        .close {
+            font-size: 28px;
+            font-weight: bold;
+            color: #999;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0;
+        }
+
+        .close:hover {
+            color: #333;
+        }
+
+        .form-modal .form-group {
+            margin-bottom: 15px;
+            width: 100%;
+        }
+
+        .form-modal input,
+        .form-modal select {
+            width: 100%;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #667eea;
+            font-size: 18px;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border: 1px solid #f5c6cb;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border: 1px solid #c3e6cb;
+        }
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card h3 {
+            font-size: 2em;
+            margin-bottom: 5px;
+        }
+
+        .stat-card p {
+            opacity: 0.9;
+            font-size: 0.9em;
+        }
+
+        .filter-chips {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .chip {
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .chip:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .chip.active {
+            background: #667eea;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏢 Customer Management System</h1>
+        <div class="subtitle">Manage your customers efficiently</div>
+
+        <div id="message"></div>
+
+        <!-- Stats Cards -->
+        <div class="stats-cards" id="statsCards"></div>
+
+        <div class="controls">
+            <div class="controls-left">
+                <button class="btn-success" onclick="openAddModal()">➕ Add New Customer</button>
+                <button class="btn-secondary" onclick="loadCustomers()">🔄 Refresh</button>
+            </div>
+        </div>
+
+        <!-- Status Filter Chips -->
+        <div class="filter-chips">
+            <div class="chip active" data-status="all" onclick="filterByStatus('all')">All Customers</div>
+            <div class="chip" data-status="ACTIVE" onclick="filterByStatus('ACTIVE')">✓ Active</div>
+            <div class="chip" data-status="INACTIVE" onclick="filterByStatus('INACTIVE')">○ Inactive</div>
+            <div class="chip" data-status="SUSPENDED" onclick="filterByStatus('SUSPENDED')">⊗ Suspended</div>
+        </div>
+
+        <!-- Simple Search -->
+        <div class="search-box">
+            <h3>🔍 Quick Search</h3>
+            <div class="search-form">
+                <div class="form-group">
+                    <input type="text" id="searchKeyword" placeholder="Search by name, email, or code..." onkeypress="if(event.key==='Enter') searchCustomers()">
+                </div>
+                <button class="btn-primary" onclick="searchCustomers()">Search</button>
+                <button class="btn-secondary" onclick="clearSearch()">Clear</button>
+            </div>
+        </div>
+
+        <!-- Advanced Search -->
+        <div class="advanced-search">
+            <h3>🔎 Advanced Search</h3>
+            <div class="search-form">
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" id="advSearchName" placeholder="Customer name...">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="advSearchEmail" placeholder="Email address...">
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select id="advSearchStatus">
+                        <option value="">All Status</option>
+                        <option value="ACTIVE">Active</option>
+                        <option value="INACTIVE">Inactive</option>
+                        <option value="SUSPENDED">Suspended</option>
+                    </select>
+                </div>
+                <button class="btn-primary" onclick="advancedSearch()">Search</button>
+                <button class="btn-secondary" onclick="clearAdvancedSearch()">Clear</button>
+            </div>
+        </div>
+
+        <!-- Sorting Controls -->
+        <div class="sort-controls">
+            <label>📊 Sort by:</label>
+            <select id="sortByField" onchange="applySort()">
+                <option value="">Default</option>
+                <option value="fullName">Name</option>
+                <option value="email">Email</option>
+                <option value="customerCode">Customer Code</option>
+                <option value="createdAt">Created Date</option>
+            </select>
+            <select id="sortDirection" onchange="applySort()">
+                <option value="asc">Ascending ↑</option>
+                <option value="desc">Descending ↓</option>
+            </select>
+        </div>
+
+        <div id="loading" class="loading" style="display: none;">⏳ Loading customers...</div>
+
+        <div id="customerTable"></div>
+
+        <div class="pagination" id="pagination"></div>
+    </div>
+
+    <!-- Add/Edit Customer Modal -->
+    <div id="customerModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Add Customer</h2>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+            <div class="form-modal">
+                <input type="hidden" id="customerId">
+                <div class="form-group">
+                    <label>Customer Code *</label>
+                    <input type="text" id="customerCode" required>
+                </div>
+                <div class="form-group">
+                    <label>Full Name *</label>
+                    <input type="text" id="fullName" required>
+                </div>
+                <div class="form-group">
+                    <label>Email *</label>
+                    <input type="email" id="email" required>
+                </div>
+                <div class="form-group">
+                    <label>Phone</label>
+                    <input type="text" id="phone">
+                </div>
+                <div class="form-group">
+                    <label>Address</label>
+                    <input type="text" id="address">
+                </div>
+                <div class="form-actions">
+                    <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button class="btn-success" onclick="saveCustomer()">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8080/api/customers';
+        let currentPage = 0;
+        let pageSize = 10;
+        let isSearchMode = false;
+        let searchKeyword = '';
+        let advSearchParams = {};
+
+        // Load customers on page load
+        window.onload = function() {
+            loadCustomers();
+        };
+
+        // Load customers with pagination
+        function loadCustomers(page = 0) {
+            currentPage = page;
+            isSearchMode = false;
+            showLoading(true);
+            
+            fetch(`${API_BASE}?page=${page}&size=${pageSize}`)
+                .then(response => response.json())
+                .then(data => {
+                    displayCustomers(data.customers);
+                    displayPagination(data.currentPage, data.totalPages, data.totalItems);
+                    showLoading(false);
+                })
+                .catch(error => {
+                    showError('Error loading customers: ' + error);
+                    showLoading(false);
+                });
+        }
+
+        // Simple search
+        function searchCustomers() {
+            searchKeyword = document.getElementById('searchKeyword').value.trim();
+            if (!searchKeyword) {
+                showError('Please enter a search keyword');
+                return;
+            }
+            
+            isSearchMode = true;
+            showLoading(true);
+            
+            fetch(`${API_BASE}/search?keyword=${encodeURIComponent(searchKeyword)}`)
+                .then(response => response.json())
+                .then(customers => {
+                    displayCustomers(customers);
+                    document.getElementById('pagination').innerHTML = '<div class="pagination-info">Showing search results</div>';
+                    showLoading(false);
+                })
+                .catch(error => {
+                    showError('Error searching customers: ' + error);
+                    showLoading(false);
+                });
+        }
+
+        // Advanced search
+        function advancedSearch() {
+            const name = document.getElementById('advSearchName').value.trim();
+            const email = document.getElementById('advSearchEmail').value.trim();
+            const status = document.getElementById('advSearchStatus').value;
+            
+            if (!name && !email && !status) {
+                showError('Please enter at least one search criterion');
+                return;
+            }
+            
+            isSearchMode = true;
+            advSearchParams = { name, email, status };
+            showLoading(true);
+            
+            const params = new URLSearchParams();
+            if (name) params.append('name', name);
+            if (email) params.append('email', email);
+            if (status) params.append('status', status);
+            
+            fetch(`${API_BASE}/advanced-search?${params}`)
+                .then(response => response.json())
+                .then(customers => {
+                    displayCustomers(customers);
+                    document.getElementById('pagination').innerHTML = '<div class="pagination-info">Showing advanced search results</div>';
+                    showLoading(false);
+                })
+                .catch(error => {
+                    showError('Error in advanced search: ' + error);
+                    showLoading(false);
+                });
+        }
+
+        // Clear simple search
+        function clearSearch() {
+            document.getElementById('searchKeyword').value = '';
+            loadCustomers(0);
+        }
+
+        // Clear advanced search
+        function clearAdvancedSearch() {
+            document.getElementById('advSearchName').value = '';
+            document.getElementById('advSearchEmail').value = '';
+            document.getElementById('advSearchStatus').value = '';
+            loadCustomers(0);
+        }
+
+        // Display customers in table
+        function displayCustomers(customers) {
+            const tableDiv = document.getElementById('customerTable');
+            
+            if (!customers || customers.length === 0) {
+                tableDiv.innerHTML = '<p style="text-align: center; padding: 40px; color: #999;">No customers found</p>';
+                return;
+            }
+            
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Full Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            customers.forEach(customer => {
+                const statusClass = `status-${customer.status.toLowerCase()}`;
+                html += `
+                    <tr>
+                        <td>${customer.customerCode}</td>
+                        <td>${customer.fullName}</td>
+                        <td>${customer.email}</td>
+                        <td>${customer.phone || '-'}</td>
+                        <td><span class="status-badge ${statusClass}">${customer.status}</span></td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn-warning" onclick="openEditModal(${customer.id})">✏️ Edit</button>
+                                <button class="btn-danger" onclick="deleteCustomer(${customer.id}, '${customer.fullName}')">🗑️ Delete</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            html += '</tbody></table>';
+            tableDiv.innerHTML = html;
+        }
+
+        // Display pagination
+        function displayPagination(currentPage, totalPages, totalItems) {
+            const paginationDiv = document.getElementById('pagination');
+            
+            let html = '<div class="pagination-info">Page ' + (currentPage + 1) + ' of ' + totalPages + ' (Total: ' + totalItems + ' customers)</div>';
+            
+            if (totalPages > 1) {
+                html += '<div style="display: flex; gap: 5px;">';
+                
+                if (currentPage > 0) {
+                    html += `<button class="btn-primary" onclick="loadCustomers(${currentPage - 1})">« Previous</button>`;
+                }
+                
+                // Page numbers
+                for (let i = 0; i < totalPages; i++) {
+                    if (i === currentPage) {
+                        html += `<button class="btn-primary" style="background: #764ba2;">${i + 1}</button>`;
+                    } else if (Math.abs(i - currentPage) <= 2 || i === 0 || i === totalPages - 1) {
+                        html += `<button class="btn-secondary" onclick="loadCustomers(${i})">${i + 1}</button>`;
+                    } else if (Math.abs(i - currentPage) === 3) {
+                        html += '<span style="padding: 10px;">...</span>';
+                    }
+                }
+                
+                if (currentPage < totalPages - 1) {
+                    html += `<button class="btn-primary" onclick="loadCustomers(${currentPage + 1})">Next »</button>`;
+                }
+                
+                html += '</div>';
+            }
+            
+            paginationDiv.innerHTML = html;
+        }
+
+        // Open add modal
+        function openAddModal() {
+            document.getElementById('modalTitle').innerText = 'Add New Customer';
+            document.getElementById('customerId').value = '';
+            document.getElementById('customerCode').value = '';
+            document.getElementById('customerCode').disabled = false;
+            document.getElementById('fullName').value = '';
+            document.getElementById('email').value = '';
+            document.getElementById('phone').value = '';
+            document.getElementById('address').value = '';
+            document.getElementById('customerModal').style.display = 'block';
+        }
+
+        // Open edit modal
+        function openEditModal(id) {
+            showLoading(true);
+            fetch(`${API_BASE}/${id}`)
+                .then(response => response.json())
+                .then(customer => {
+                    document.getElementById('modalTitle').innerText = 'Edit Customer';
+                    document.getElementById('customerId').value = customer.id;
+                    document.getElementById('customerCode').value = customer.customerCode;
+                    document.getElementById('customerCode').disabled = true;
+                    document.getElementById('fullName').value = customer.fullName;
+                    document.getElementById('email').value = customer.email;
+                    document.getElementById('phone').value = customer.phone || '';
+                    document.getElementById('address').value = customer.address || '';
+                    document.getElementById('customerModal').style.display = 'block';
+                    showLoading(false);
+                })
+                .catch(error => {
+                    showError('Error loading customer: ' + error);
+                    showLoading(false);
+                });
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('customerModal').style.display = 'none';
+        }
+
+        // Save customer (create or update)
+        function saveCustomer() {
+            const id = document.getElementById('customerId').value;
+            const customerData = {
+                customerCode: document.getElementById('customerCode').value.trim(),
+                fullName: document.getElementById('fullName').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                phone: document.getElementById('phone').value.trim(),
+                address: document.getElementById('address').value.trim()
+            };
+            
+            if (!customerData.customerCode || !customerData.fullName || !customerData.email) {
+                showError('Please fill in all required fields');
+                return;
+            }
+            
+            const url = id ? `${API_BASE}/${id}` : API_BASE;
+            const method = id ? 'PUT' : 'POST';
+            
+            fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(customerData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => { throw err; });
+                }
+                return response.json();
+            })
+            .then(data => {
+                showSuccess(id ? 'Customer updated successfully!' : 'Customer created successfully!');
+                closeModal();
+                loadCustomers(currentPage);
+            })
+            .catch(error => {
+                showError('Error saving customer: ' + (error.message || error));
+            });
+        }
+
+        // Delete customer
+        function deleteCustomer(id, name) {
+            if (!confirm(`Are you sure you want to delete customer "${name}"?`)) {
+                return;
+            }
+            
+            fetch(`${API_BASE}/${id}`, {
+                method: 'DELETE'
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to delete customer');
+                }
+                return response.json();
+            })
+            .then(data => {
+                showSuccess('Customer deleted successfully!');
+                loadCustomers(currentPage);
+            })
+            .catch(error => {
+                showError('Error deleting customer: ' + error);
+            });
+        }
+
+        // Show loading indicator
+        function showLoading(show) {
+            document.getElementById('loading').style.display = show ? 'block' : 'none';
+        }
+
+        // Show error message
+        function showError(message) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.innerHTML = `<div class="error">❌ ${message}</div>`;
+            setTimeout(() => { messageDiv.innerHTML = ''; }, 5000);
+        }
+
+        // Show success message
+        function showSuccess(message) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.innerHTML = `<div class="success">✅ ${message}</div>`;
+            setTimeout(() => { messageDiv.innerHTML = ''; }, 3000);
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('customerModal');
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>
